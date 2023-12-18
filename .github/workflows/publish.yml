@@ -39,15 +39,65 @@ jobs:
         run: make build
 
       - name: upload artifact release
-        if: matrix.platform != 'windows-latest'
+#        if: matrix.platform != 'windows-latest'
         uses: actions/upload-artifact@v2
         with:
           name: ${{matrix.platform}}
           path: ./build/api-userbase
 
-      - name: upload artifact release
-        if: matrix.platform == 'windows-latest'
-        uses: actions/upload-artifact@v2
+#      - name: upload artifact release
+#        if: matrix.platform == 'windows-latest'
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: ${{matrix.platform}}
+#          path: ./build/api-userbase.exe
+
+  publish:
+    needs : [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          name: ${{matrix.platform}}
-          path: ./build/api-userbase.exe
+          id: create_release
+          tag_name: ${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
+          draft: false
+          prerelease: false
+
+      - name: Download all artifact
+        uses: actions/download-artifact@v2
+
+      - name: Upload ubuntu release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ubuntu-latest
+          asset_name: ${{ github.event.repository.name }}-release-ubuntu-v${{ github.run_number }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload macos release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: macos-latest
+          asset_name: ${{ github.event.repository.name }}-release-macos-v${{ github.run_number }}
+          asset_content_type: application/octet-stream
+
+
+      - name: Upload windows release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: windows-latest
+          asset_name: ${{ github.event.repository.name }}-release-windows-v${{ github.run_number }}.exe
+          asset_content_type: application/x-msdownload
