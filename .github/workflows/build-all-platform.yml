@@ -1,0 +1,39 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ macos-latest, ubuntu-20.04, windows-latest ]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: installing Make if Ubuntu
+        if: matrix.platform == 'ubuntu-20.04'
+        run : |
+          sudo apt update 
+          sudo apt-get install make -y
+
+      - name: installing Make if MacOS
+        if: matrix.platform == 'macos-latest'
+        run : |
+          brew update 
+          brew install make
+
+      - name: installing Make if Windows
+        if: matrix.platform == 'windows-latest'
+        run : |
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          choco install make
+
+      - name: build
+        run: make build
