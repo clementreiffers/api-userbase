@@ -19,3 +19,9 @@ build: clean install
 run: build
 	@echo "${PURPLE}Running executable...${NC}"
 	./${EXECUTABLE_PATH}
+
+curls-create-user:
+	curl -X POST -H 'Content-Type: application/json' -d '{"name":"clement", "ID": "srlkghfq"}' http://localhost:8080/add-user
+	curl -X GET -H 'Content-Type: application/json' -d '{"name":"clement", "ID": "111"}' http://localhost:8080/get-user
+
+curls: curls-create-user
