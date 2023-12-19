@@ -3,6 +3,7 @@ EXECUTABLE_FILENAME=api-userbase
 EXECUTABLE_PATH=${BUILD_DIRECTORY}${EXECUTABLE_FILENAME}
 PURPLE=\033[0;35m
 NC=\033[0m
+MONGO_URI=mongodb://localhost:27017/test
 
 clean:
 	@echo "${PURPLE}Cleaning build directory...${NC}"
@@ -23,7 +24,7 @@ build_alpine: clean install
 
 run: build
 	@echo "${PURPLE}Running executable...${NC}"
-	./${EXECUTABLE_PATH}
+	./${EXECUTABLE_PATH} --mongoUri ${MONGO_URI}
 
 curls-create-user:
 	curl -X POST -H 'Content-Type: application/json' -d '{"name":"clement", "ID": "srlkghfq"}' http://localhost:8080/add-user

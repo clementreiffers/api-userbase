@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -69,7 +70,15 @@ func connectMongo(uri string) *mongo.Client {
 }
 
 func main() {
-	client := connectMongo("mongodb://localhost:27017/test")
+	mongoUri := flag.String("mongoUri", "", "the uri to access to mongodb")
+
+	flag.Parse()
+
+	if *mongoUri == "" {
+		panic("you need to specify the -mongoUri flag")
+	}
+
+	client := connectMongo(*mongoUri)
 	userDatabase := client.Database("company").Collection("users")
 
 	r := gin.Default()
