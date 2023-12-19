@@ -63,15 +63,15 @@ jobs:
       - name: Download all artifact
         uses: actions/download-artifact@v2
 
-      - name: Upload ubuntu release asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ubuntu-20.04
-          asset_name: ${{ github.event.repository.name }}-release-ubuntu-v${{ github.run_number }}
-          asset_content_type: application/octet-stream
+#      - name: Upload ubuntu release asset
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: ubuntu-20.04
+#          asset_name: ${{ github.event.repository.name }}-release-ubuntu-v${{ github.run_number }}
+#          asset_content_type: application/octet-stream
 
       - name: Upload macos release asset
         uses: actions/upload-release-asset@v1
