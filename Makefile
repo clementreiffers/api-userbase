@@ -16,6 +16,11 @@ build: clean install
 	@echo "${PURPLE}Building executable...${NC}"
 	cd src && go build -o ../${EXECUTABLE_PATH} .
 
+build_alpine: clean install
+	@echo "${PURPLE}Building executable for alpine...${NC}"
+	cd src && GOOS=linux GOARCH=amd64 go build -o ../${EXECUTABLE_PATH} .
+	@echo "${PURPLE}Building done!${NC}"
+
 run: build
 	@echo "${PURPLE}Running executable...${NC}"
 	./${EXECUTABLE_PATH}
