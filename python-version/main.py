@@ -1,25 +1,27 @@
 from fastapi import FastAPI
 import pymongo
-
-app = FastAPI()
+from pydantic import BaseModel
 
 mongo_uri = "mongodb://localhost:27017/userBase"
-
-client = pymongo.MongoClient(mongo_uri)
 database_name = "userBase"
 collection_name = "users"
-collection = client[database_name][collection_name]
+
+collection = pymongo.MongoClient(mongo_uri)[database_name][collection_name]
+app = FastAPI()
+
+
+class User(BaseModel):
+    name: str
 
 
 @app.get("/get-user")
-async def get_user(json_body: dict):
-    return str(list(map(lambda document: document, collection.find(json_body))))
+async def get_user(user: User):
+    return str(list(map(lambda document: document, collection.find(user.model_dump()))))
 
 
 @app.post("/add-user")
-async def add_user(json_body: dict):
-    insert_result = collection.insert_one(json_body)
-
+async def add_user(user: User):
+    insert_result = collection.insert_one(user.model_dump())
     return {
         "message": "successfully uploaded"
         if insert_result.inserted_id
