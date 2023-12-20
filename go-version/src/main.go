@@ -2,13 +2,15 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 	"net/http"
+	"os"
 )
 
 func ping(c *gin.Context) {
@@ -70,15 +72,17 @@ func connectMongo(uri string) *mongo.Client {
 }
 
 func main() {
-	mongoUri := flag.String("mongoUri", "", "the uri to access to mongodb")
-
-	flag.Parse()
-
-	if *mongoUri == "" {
-		panic("you need to specify the -mongoUri flag")
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
 	}
 
-	client := connectMongo(*mongoUri)
+	mongoUri := os.Getenv("MONGO_URI")
+	if mongoUri == "" {
+		fmt.Printf("you need to specify the MONGO_URI inside a .env file")
+	}
+
+	client := connectMongo(mongoUri)
 	userDatabase := client.Database("company").Collection("users")
 
 	r := gin.Default()
@@ -91,7 +95,7 @@ func main() {
 	r.GET("/get-user", getUser)
 	r.POST("/add-user", addUser)
 
-	err := r.Run()
+	err = r.Run()
 	if err != nil {
 		fmt.Printf("%e\n", err)
 	}

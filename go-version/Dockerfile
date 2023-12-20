@@ -12,6 +12,7 @@ FROM alpine as runner
 
 WORKDIR /
 
+COPY .env ./
 COPY --from=builder /workspace/build/api-userbase ./api-userbase
 
 CMD ./api-userbase
