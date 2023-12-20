@@ -1,8 +1,14 @@
 from fastapi import FastAPI
 import pymongo
 from pydantic import BaseModel
+import argparse
 
-mongo_uri = "mongodb://localhost:27017/userBase"
+parser = argparse.ArgumentParser()
+parser.add_argument("-h", "--hostname", help="mongodb host")
+
+args = parser.parse_args()
+
+mongo_uri = args.hostname
 database_name = "userBase"
 collection_name = "users"
 
