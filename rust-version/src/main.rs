@@ -1,5 +1,7 @@
 use actix_web::web::Data;
 use actix_web::{get, post, web, App, HttpResponse, HttpServer};
+use clap::{arg, Parser};
+use env_logger::Env;
 use futures::stream::TryStreamExt;
 use mongodb::bson::doc;
 use mongodb::results::InsertOneResult;
@@ -71,13 +73,18 @@ async fn connect_mongo_database(uri: &str) -> Database {
     database
 }
 
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about=None)]
+struct Parameters {
+    #[arg(long)]
+    mongo_uri: String,
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    std::env::set_var("RUST_LOG", "debug");
-    env_logger::init();
-    let uri = "mongodb://localhost:27017/userBase";
-
-    let database = connect_mongo_database(uri).await;
+    env_logger::init_from_env(Env::default().default_filter_or("info"));
+    let parameters = Parameters::parse();
+    let database = connect_mongo_database(&parameters.mongo_uri).await;
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(database.clone()))
